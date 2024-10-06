@@ -32,15 +32,15 @@ pipeline {
      stage('Login to Dockerhub') {
       steps {
         echo 'This stage will loginto Dockerhub'
-        withCredentials([usernamePassword(credentialsId: 'dockerloginnew', passwordVariable: 'dockerpass', usernameVariable: 'dockeruser')]) {
-        sh 'docker login -u ${dockeruser} -p ${dockerpass}'
-                          }
-              }
-     }
+        withCredentials([usernamePassword(credentialsId: 'dockerlogginnew2', passwordVariable: 'dockerpass1', usernameVariable: 'dockeruser1')]) {
+        sh 'docker login -u ${dockeruser1} -p ${dockerpass1}'
+            }
+        }
+      }
      stage('Docker Push-Image') {
       steps {
         echo 'This stage will push my new image to the dockerhub'
-        sh 'docker push hgowda123/healthcare:1.0'
+        sh 'docker push hgowda123/healthcare123:1.0'
             }
       }
    }
