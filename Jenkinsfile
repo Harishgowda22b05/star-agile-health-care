@@ -3,10 +3,7 @@ pipeline {
      tools {
        maven 'M2_HOME'
            }
-      environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-      }
+     
   stages {
     stage('Git Checkout') {
       steps {
@@ -46,6 +43,12 @@ pipeline {
         sh 'docker push hgowda123/healthcare:1.0'
             }
       }
+     stage('AWS-Login') {
+      steps {
+        withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'Awsaccess', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+         }
+      }
+    }
      stage('Terraform Operations for test workspace') {
       steps {
         script {
