@@ -34,13 +34,13 @@ pipeline {
         echo 'This stage will loginto Dockerhub'
         withCredentials([usernamePassword(credentialsId: 'dockerloginnew', passwordVariable: 'dockerpass', usernameVariable: 'dockeruser')]) {
         sh 'docker login -u ${dockeruser} -p ${dockerpass}'
-            }
-      }
+                          }
+              }
      }
      stage('Docker Push-Image') {
       steps {
         echo 'This stage will push my new image to the dockerhub'
-        sh 'docker push hgowda123/healthcare'
+        sh 'docker push hgowda123/healthcare:1.0 .'
             }
       }
    }
