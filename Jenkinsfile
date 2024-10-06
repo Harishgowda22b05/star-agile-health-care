@@ -49,36 +49,46 @@ pipeline {
          }
       }
     }
-    stage('Terraform Operations for test workspace') {
+    stages {
+    stage('Terraform Operations for Test Workspace') {
       steps {
         script {
           sh '''
+            # Select or create the test workspace
             terraform workspace select test || terraform workspace new test
             terraform init
             terraform plan
-            terraform destroy -auto-approve
+            terraform destroy -auto-approve  # Consider if this is the desired flow
           '''
         }
       }
     }
-    stage('Terraform destroy & apply for test workspace') {
+
+    stage('Terraform Destroy & Apply for Test Workspace') {
       steps {
         sh 'terraform apply -auto-approve'
       }
     }
-    stage('get kubeconfig') {
+
+    stage('Get Kubeconfig for Test') {
       steps {
-        sh 'aws eks update-kubeconfig --region ap-south-1 --name test-cluster'
-        sh 'kubectl get nodes'
+        sh '''
+          aws eks update-kubeconfig --region ap-south-1 --name test-cluster
+          kubectl get nodes
+        '''
       }
     }
-    stage('Deploying the application') {
+
+    stage('Deploying the Application to Test') {
       steps {
-        sh 'kubectl apply -f app-deploy.yml'
-        sh 'kubectl get svc'
+        sh '''
+          kubectl apply -f app-deploy.yml
+          kubectl get svc
+        '''
       }
     }
-    stage('Terraform Operations for Production workspace') {
+
+    stage('Terraform Operations for Production Workspace') {
       when {
         expression {
           return currentBuild.currentResult == 'SUCCESS'
@@ -87,29 +97,37 @@ pipeline {
       steps {
         script {
           sh '''
+            # Select or create the production workspace
             terraform workspace select prod || terraform workspace new prod
             terraform init
             terraform plan
-            terraform destroy -auto-approve
+            terraform destroy -auto-approve  # Re-evaluate this command's placement
           '''
         }
       }
     }
-    stage('Terraform destroy & apply for production workspace') {
+
+    stage('Terraform Destroy & Apply for Production Workspace') {
       steps {
         sh 'terraform apply -auto-approve'
       }
     }
-    stage('get kubeconfig for production') {
+
+    stage('Get Kubeconfig for Production') {
       steps {
-        sh 'aws eks update-kubeconfig --region ap-south-1 --name prod-cluster'
-        sh 'kubectl get nodes'
+        sh '''
+          aws eks update-kubeconfig --region ap-south-1 --name prod-cluster
+          kubectl get nodes
+        '''
       }
     }
-    stage('Deploying the application to production') {
+
+    stage('Deploying the Application to Production') {
       steps {
-        sh 'kubectl apply -f app-deploy.yml'
-        sh 'kubectl get svc'
+        sh '''
+          kubectl apply -f app-deploy.yml
+          kubectl get svc
+        '''
       }
     }
   }
