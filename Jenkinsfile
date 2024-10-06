@@ -65,22 +65,23 @@ pipeline {
     }
     stage('get kubeconfig') {
       steps {
-        sh 'aws eks update-kubeconfig --region ap-south-1 --name test-cluster'
+        sh 'aws eks update-kubeconfig --region us-east-1 --name test-cluster'
         sh 'kubectl get nodes'
       }
-    }  stage('Deploying the application') {
+    }
+    stage('Deploying the application') {
       steps {
         sh 'kubectl apply -f app-deploy.yml'
         sh 'kubectl get svc'
       }
     }
-    stage('Terraform Operations for Production workspace') {
+   stage('Terraform Operations for Production workspace') {
       when {
         expression {
           return currentBuild.currentResult == 'SUCCESS'
         }
       }
-      steps {
+     steps {
         script {
           sh '''
             terraform workspace select prod || terraform workspace new prod
@@ -90,22 +91,23 @@ pipeline {
           '''
         }
       }
-    }stage('Terraform destroy & apply for production workspace') {
+    }
+     stage('Terraform destroy & apply for production workspace') {
       steps {
         sh 'terraform apply -auto-approve'
       }
     }
-    stage('get kubeconfig for production') {
+   stage('get kubeconfig for production') {
       steps {
         sh 'aws eks update-kubeconfig --region us-east-1 --name prod-cluster'
         sh 'kubectl get nodes'
       }
     }
-    stage('Deploying the application to production') {
+     stage('Deploying the application to production') {
       steps {
         sh 'kubectl apply -f app-deploy.yml'
         sh 'kubectl get svc'
-       }
-     }
+      }
+    }
   }
 }
